@@ -5,28 +5,32 @@ def grep_file(regular_expression, file, count, not_option, ignore_case):
     print("FILE : ",file)
     if os.path.exists(file):
         file_descriptor = open(file, 'r')
-        lines = file_descriptor.readlines()
-        count_number_appearances = 0
-        is_match_in_a_file = False
-        for line in lines:
-            if ignore_case:
-                if regular_expression.lower() in line.lower():
+        try :
+            lines = file_descriptor.readlines()
+            count_number_appearances = 0
+            is_match_in_a_file = False
+            for line in lines:
+                if ignore_case:
+                    if regular_expression.lower() in line.lower():
+                        print(line)
+                if bool(re.match(regular_expression, line)) and not ignore_case:
                     print(line)
-            if bool(re.match(regular_expression, line)) and not ignore_case:
-                print(line)
-                is_match_in_a_file = True
-            if count and bool(re.match(regular_expression, line)):
-                count_number_appearances = count_number_appearances + 1
-        file_descriptor.close()
-        if not_option:
-            if is_match_in_a_file:
-                print("There is a match in this file for the this regular expression ")
-            else:
-                print("There is no match in this file for the this regular expression")
-        if count:
-            print("Number of appearances: ", count_number_appearances)
-    else:
-        print("File ", file, " doesn't exist ! ")
+                    is_match_in_a_file = True
+                if count and bool(re.match(regular_expression, line)) or regular_expression.lower() in line.lower() and ignore_case:
+                    count_number_appearances = count_number_appearances + 1
+                    is_match_in_a_file = True
+            file_descriptor.close()
+            if not_option:
+                if is_match_in_a_file:
+                    print("There is a match in this file for the this regular expression ")
+                else:
+                    print("There is no match in this file for the this regular expression")
+            if count:
+                print("Number of appearances: ", count_number_appearances)
+        except:
+            print("There is an exception")
+        #else:
+            #print("File ", file, " doesn't exist ! ")
 
 
 def grep_for_dir(regular_expression, director, count, not_option, ignore_case):
@@ -34,7 +38,7 @@ def grep_for_dir(regular_expression, director, count, not_option, ignore_case):
         content_dir = os.listdir(director)
         for component in content_dir:
             path_component = os.path.join(director, component)
-            if os.path.isfile(path_component):
+            if os.path.isfile(path_component) and not path_component.endswith(".pdf") and not path_component.endswith(".aes"):
                 grep_file(regular_expression, path_component, count, not_option, ignore_case)
             else:
                 if os.path.isdir(path_component):
